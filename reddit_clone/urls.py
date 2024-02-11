@@ -21,5 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     # path('users/', include('user.urls')),
-    path('/', include('reddit.urls')),
+    path('', include('reddit.urls')),
 ]

@@ -1,1 +1,11 @@
+{% load humanize %}
 <h3>Welcome to r/{{ subreddit.name }} sub!</h3>
+<h4>List of posts</h4>
+<ul>
+    {% for post in post_list %}
+        <li>
+            <h5><a href="{{ post.get_absolute_url }}"> {{ post.title }}</a></h5>
+            submitted {{ post.creation_date|naturaltime }} by <b>{{ post.author }}</b>  to r/{{ subreddit.name }}.
+        </li>
+    {% endfor %}
+</ul>

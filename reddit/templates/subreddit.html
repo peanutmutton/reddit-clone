@@ -4,8 +4,23 @@
 <ul>
     {% for post in post_list %}
         <li>
-            <h5><a href="{{ post.get_absolute_url }}"> {{ post.title }}</a></h5>
+            <h3>{{ forloop.counter }}<a href="{{ post.get_absolute_url }}"> {{ post.title }}</a></h3>
             submitted {{ post.creation_date|naturaltime }} by <b>{{ post.author }}</b>  to r/{{ subreddit.name }}.
+            <p>{{ post.body | truncatechars:30 }}</p>
+{#           Check if vote by the user exists and its value #}
+            {% for user_vote in user_votes %}
+            	{% if user_vote.post == post %}
+            		{% if user_vote.type == True %}
+                        <b>Upvoted</b>
+                    {% elif user_vote.type == False %}
+                        <b>Downvoted</b>
+                    {% endif %}
+            	{% endif %}
+            {% endfor %}
+
+            <a class="upvote" href="{% url 'likepost' post.pk 'true' %}" >Upvote</a>
+            <a class="downvote" href="{% url 'likepost' post.pk 'false' %}" >Downvote</a>
         </li>
     {% endfor %}
 </ul>
+<p id="message"></p>

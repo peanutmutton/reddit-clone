@@ -34,6 +34,8 @@ class PostVote(models.Model):
     type = models.BooleanField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    class Meta:
+        unique_together = ['user', 'post']
 class CommentVote(models.Model):
     type = models.BooleanField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)

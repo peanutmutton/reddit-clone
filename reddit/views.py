@@ -1,10 +1,12 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import get_user_model
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 
-from .models import Subreddit, Post
+from .models import Subreddit, Post, PostVote
 from .forms import SubmitPostForm
+
 
 User = get_user_model()
 def home_view(request):
@@ -17,7 +19,10 @@ def user_view(request, username):
 def subreddit_view(request, name):
     subreddit = get_object_or_404(Subreddit.objects.all(), name=name)
     post_list = subreddit.post_set.all()
-    return render(request, 'subreddit.html', {'subreddit': subreddit, 'post_list': post_list})
+
+    user_votes = PostVote.objects.filter(user=request.user)
+
+    return render(request, 'subreddit.html', {'subreddit': subreddit, 'post_list': post_list, 'user_votes': user_votes})
 
 def post_view(request, name, pk):
     subreddit = get_object_or_404(Subreddit.objects.all(), name=name)
@@ -42,3 +47,35 @@ def submit_post_view(request):
     else:
         form = SubmitPostForm()
     return render(request, 'submit_post.html', {'form': form})
+
+
+# src:https://www.geeksforgeeks.org/handling-ajax-request-in-django/
+def like_post(request, pk, vote_type):
+    if vote_type == 'true':
+        vote_type = True
+    elif vote_type == 'false':
+        vote_type = False
+    if request.method == 'GET':
+        likedpost = get_object_or_404(Post.objects.all(), id=pk)
+        try:
+            vote = PostVote.objects.get(post=likedpost,user=request.user)
+
+
+
+            if (vote.type == True and vote_type == True) or vote.type == False and vote_type == False:
+                vote.delete()
+            elif vote.type == False and vote_type == True:
+                vote.type = True
+                vote.save()
+            elif vote.type == True and vote_type == False:
+                vote.type = False
+                vote.save()
+        except:
+            if vote_type == True:
+                m = PostVote(post=likedpost, user=request.user, type=True)
+            elif vote_type == False:
+                m = PostVote(post=likedpost, user=request.user, type=False)
+            m.save()
+        return redirect(reverse('subreddit', args = [likedpost.subreddit.name]))
+    else:
+        return HttpResponse("Request method is not GET")

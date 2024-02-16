@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Title{% endblock %}</title>
+</head>
+<body>
+    {% block panel %}
+    	<ul>
+            {% if user.is_authenticated %}
+                <li>
+                    <a href="{% url 'account_logout' %}">Log Out</a>
+
+                </li>
+            {% else     %}
+                <li>
+                    <a href="{% url 'account_login' %}">Log In</a>
+                </li>
+                <li>
+                    <a href="{% url 'account_signup' %}">Sign Up</a>
+                </li>
+            {% endif %}
+        </ul>
+    {% endblock %}
+    {% block content %}
+    	
+    {% endblock %}
+</body>
+</html>
